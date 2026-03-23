@@ -1,4 +1,4 @@
-# Put this script on Gideon in /root
+# Have this script on Gideon in /root/sugar-mill eg by cloning the repo
 exec 3<>db.rosuav.com.pem
 while read line; do
 	[ "$line" == '-----BEGIN PRIVATE KEY-----' ] && exec 3>&- && exec 3<>db.rosuav.com.key
