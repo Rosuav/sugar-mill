@@ -25,4 +25,6 @@ Next steps
 
 * Make gen-cert check the certificate validity and do nothing if still
   plenty of time (but maybe allow a "force" parameter)
+  - openssl x509 -noout -dates -in db.rosuav.com.pem
+  - Or use Pike's and see if we can get it in a better format
 * Schedule gen-cert using cron
