@@ -5,4 +5,5 @@ while read line; do
 	echo $line >&3
 done
 exec 3>&-
+chmod 400 db.rosuav.com.key
 ./deploy
