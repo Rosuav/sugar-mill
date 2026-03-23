@@ -7,7 +7,7 @@ in memory of the witches.
 Generate the signing authority self-signed cert
 -----------------------------------------------
 
-    # openssl genrsa -des3 -passout pass: -out sugarmill.rosuav.com.key 2048
+    # openssl genrsa -des3 -passout pass: -out sugarmill.rosuav.com.key 4096
     # openssl req -x509 -new -nodes -passin pass: -key sugarmill.rosuav.com.key -sha256 -days 3650 -out sugarmill.rosuav.com.pem -subj '/CN=sugarmill.rosuav.com'
     # cp sugarmill.rosuav.com.pem /usr/local/share/ca-certificates/
     # update-ca-certificates
