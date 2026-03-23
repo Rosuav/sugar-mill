@@ -11,12 +11,12 @@ Generate the signing authority self-signed cert
     # openssl req -x509 -new -nodes -passin pass: -key sugarmill.rosuav.com.key -sha256 -days 3650 -out sugarmill.rosuav.com.pem -subj '/CN=sugarmill.rosuav.com'
     # cp sugarmill.rosuav.com.pem /usr/local/share/ca-certificates/
     # update-ca-certificates
+    # scp sugarmill.rosuav.com.pem gideon:/usr/local/share/ca-certificates/
+    # ssh gideon update-ca-certificates
 
 This should be needed only very rarely and need not be automated.
 
-Copy the root cert also to Gideon.
-
-The root key remains in this directory and will only be accessible to the root user.
+Gideon needs the cert, but not the key.
 
 Generate the active cert
 ------------------------
