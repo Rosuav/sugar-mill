@@ -6,9 +6,5 @@ openssl genrsa -out db.rosuav.com.key -traditional 4096
 openssl req -new -key db.rosuav.com.key -out db.rosuav.com.csr -subj '/CN=db.rosuav.com'
 echo 'subjectAltName=DNS:ipv4.rosuav.com,DNS:sikorsky.rosuav.com' | openssl x509 -req -passin pass: -in db.rosuav.com.csr -CA sugarmill.rosuav.com.pem -CAkey sugarmill.rosuav.com.key -out db.rosuav.com.pem -days 90 -sha256 -extfile -
 rm db.rosuav.com.csr # Delete the bag of sugar
-cp db.rosuav.com.* /home/rosuav/stillebot/
-chown rosuav: /home/rosuav/stillebot/db.rosuav.com.*
-cp db.rosuav.com.* /etc/postgresql/16/main/
-chown postgres: /etc/postgresql/16/main/db.rosuav.com.*
-systemctl reload postgresql
+./deploy
 cat db.rosuav.com.* | ssh gideon sugar-mill/update_db_key.sh
