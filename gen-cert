@@ -1,7 +1,10 @@
 #!/bin/sh
 
-# TODO: Check the cert validity and ignore if there's at least 30 days left
+# Check the cert validity and ignore if there's at least 30 days left
 # Obviously if the cert isn't present, there's no validity on it
+pike certvalid.pike db.rosuav.com.pem 30 && exit
+# Okay, we need a new cert. Make one!
+[ ! -f sugarmill.rosuav.com.key ] && { echo "Unable to generate certs, no sugarmill present"; exit 1; }
 openssl genrsa -out db.rosuav.com.key -traditional 4096
 openssl req -new -key db.rosuav.com.key -out db.rosuav.com.csr -subj '/CN=db.rosuav.com'
 echo 'subjectAltName=DNS:ipv4.rosuav.com,DNS:sikorsky.rosuav.com' | openssl x509 -req -passin pass: -in db.rosuav.com.csr -CA sugarmill.rosuav.com.pem -CAkey sugarmill.rosuav.com.key -out db.rosuav.com.pem -days 90 -sha256 -extfile -
