@@ -1,0 +1,5 @@
+# Copy/link this file to /etc/cron.d/sugar-mill to activate it
+# Regenerate database connection certificates every roughly two months
+# The certificates are given 90 days of validity; gen-cert will only
+# regen the cert if it has less than 30 days left.
+30 23 * * * root cd /root/sugar-mill && ./gen-cert

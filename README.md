@@ -19,8 +19,3 @@ This should be needed only very rarely and need not be automated.
 Gideon needs the cert, but not the key.
 
 Generating the active cert is done by the gen-cert script.
-
-Next steps
-----------
-
-* Schedule gen-cert using cron
