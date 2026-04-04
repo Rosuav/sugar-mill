@@ -5,6 +5,7 @@ int main(int argc, array (string) argv) {
 	catch {
 		object cert = Standards.X509.decode_certificate(Standards.PEM.Messages(raw)->get_certificates()[0]);
 		int days_remaining = (cert->not_after - time()) / 86400; //Complete days of validity
+		if ((int)argv[2] <= 0) exit(1, "Days remaining: %d\n", days_remaining);
 		if (days_remaining >= (int)argv[2]) return 0;
 		return 1;
 	};
