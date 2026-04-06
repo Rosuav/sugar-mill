@@ -4,15 +4,8 @@ import socket
 import asyncio
 import pyotp
 
-def getsockopt(fd, level, opt):
-	sock = socket.socket(fileno=fd)
-	try: return sock.getsockopt(level, opt)
-	finally: sock.detach() # Detach even if we hit an error of some sort
-
 async def client(reader, writer):
-	print("Got connection, sock is", writer.get_extra_info("sock"))
-	fd = reader._transport._sock_fd
-	pid = getsockopt(fd, socket.SOL_SOCKET, socket.SO_PEERCRED);
+	pid = writer.get_extra_info("socket").getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED);
 	print("Connection from", pid)
 	writer.write(b"hello\n")
 	await writer.drain()
