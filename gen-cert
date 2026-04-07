@@ -2,7 +2,7 @@
 
 # Check the cert validity and ignore if there's at least 30 days left
 # Obviously if the cert isn't present, there's no validity on it
-pike certvalid.pike db.rosuav.com.pem 30 && exit
+/usr/local/bin/pike certvalid.pike db.rosuav.com.pem 30 && exit
 # Okay, we need a new cert. Make one!
 [ ! -f sugarmill.rosuav.com.key ] && { echo "Unable to generate certs, no sugarmill present"; exit 1; }
 openssl genrsa -out db.rosuav.com.key -traditional 4096
