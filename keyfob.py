@@ -32,11 +32,13 @@ async def client(reader, writer):
 				writer.write(b"error Unknown file requested\n")
 				await writer.drain()
 				continue
-			pem = key = None
+			cert = b""
 			try:
 				with open(fn + ".pem", "rb") as p, open(fn + ".key", "rb") as k:
-					pem = p.read()
-					key = k.read()
+					cert = p.read()
+					if not cert.endswith(b"\n"): cert += b"\n" # It should normally end with a newline, but make absolutely sure.
+					cert += k.read()
+					if not cert.endswith(b"\n"): cert += b"\n"
 			except FileNotFoundError:
 				writer.write(b"error File not found\n") # Valid name but not on this system
 				await writer.drain()
@@ -45,17 +47,10 @@ async def client(reader, writer):
 				writer.write(b"error Unexpected " + type(e).__name__.encode() + b"\n")
 				await writer.drain()
 				continue
-			if not pem.endswith(b"\n"): pem += b"\n"
-			if not key.endswith(b"\n"): key += b"\n"
-			if b"\n.\n" in pem or b"\n.\n" in key:
+			if b"\n.\n" in cert:
 				# The other end doesn't have handling for this, but it really shouldn't happen
-				pem = key = b"INVALID CONTENT"
-			writer.write(b"privkey " + fn.encode() + b"\n")
-			writer.write(key)
-			writer.write(b".\n")
-			writer.write(b"certificate " + fn.encode() + b"\n")
-			writer.write(pem)
-			writer.write(b".\n")
+				cert = b"INVALID CONTENT\n"
+			writer.write(b"certificate %s\n%s.\n" % (fn.encode(), cert))
 			# At this point, we've sent the file requested, but we also know that this client finds
 			# this file to be useful. It MAY be worth holding onto that information and sending the
 			# updated cert/key when it becomes available. The client will react accordingly and can
