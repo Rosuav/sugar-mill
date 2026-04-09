@@ -64,7 +64,20 @@ async def main():
 		secret = f.read().strip()
 		global totp
 		totp = pyotp.TOTP(secret, 8)
-	await asyncio.start_unix_server(client, "/tmp/certmgr")
-	await asyncio.Future()
+	# The live key fob has its socket in /var/run, which only root can bind to.
+	# For testing purposes, toss a socket into /tmp instead.
+	sockpath = "/tmp/certmgr" if os.getuid() else "/var/run/certmgr"
+	srv = await asyncio.start_unix_server(client, sockpath)
+	print(srv)
+	if os.getuid() == 0:
+		# Grant group permission on the socket so that non-root users can connect
+		# TODO: Use the fd from the server instead?
+		import grp
+		os.chown(sockpath, 0, grp.getgrnam("adm").gr_gid)
+		os.chmod(sockpath, 0o660)
+	try:
+		await asyncio.Future()
+	except asyncio.CancelledError:
+		print("Shutting down.") # I don't hate you!
 
 asyncio.run(main())
