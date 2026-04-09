@@ -4,6 +4,8 @@ import socket
 import asyncio
 import pyotp
 
+totp = None
+
 async def client(reader, writer):
 	pid = writer.get_extra_info("socket").getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED);
 	print("Connection from", pid)
@@ -14,7 +16,7 @@ async def client(reader, writer):
 		[cmd, *args] = line.decode().strip().split()
 		if cmd == "auth":
 			# Needs one argument: 2FA code.
-			if pyotp.TOTP("JBSWY3DPEHPK3PXP", 8).verify(args[0] if args else ""):
+			if totp.verify(args[0] if args else ""):
 				writer.write(b"login ok\n")
 				await writer.drain()
 				logged_in = True
@@ -58,6 +60,10 @@ async def client(reader, writer):
 
 async def main():
 	print("I am", os.getpid())
+	with open("2fa.key") as f: # FileNotFoundError? Store the secret so the TOTPs work
+		secret = f.read().strip()
+		global totp
+		totp = pyotp.TOTP(secret, 8)
 	await asyncio.start_unix_server(client, "/tmp/certmgr")
 	await asyncio.Future()
 
