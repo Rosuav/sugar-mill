@@ -68,7 +68,6 @@ async def main():
 	# For testing purposes, toss a socket into /tmp instead.
 	sockpath = "/tmp/certmgr" if os.getuid() else "/var/run/certmgr"
 	srv = await asyncio.start_unix_server(client, sockpath)
-	print(srv)
 	if os.getuid() == 0:
 		# Grant group permission on the socket so that non-root users can connect
 		# TODO: Use the fd from the server instead?
