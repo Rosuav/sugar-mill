@@ -17,6 +17,7 @@ async def client(reader, writer):
 		if cmd == "auth":
 			# Needs one argument: 2FA code.
 			if totp.verify(args[0] if args else ""):
+				print("Authenticated", pid)
 				writer.write(b"login ok\n")
 				await writer.drain()
 				logged_in = True
@@ -59,7 +60,6 @@ async def client(reader, writer):
 			# reconnect to whatever's needed.
 
 async def main():
-	print("I am", os.getpid())
 	with open("2fa.key") as f: # FileNotFoundError? Store the secret so the TOTPs work
 		secret = f.read().strip()
 		global totp
