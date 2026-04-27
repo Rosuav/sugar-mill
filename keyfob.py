@@ -62,6 +62,9 @@ async def client(reader, writer):
 			# this file to be useful. It MAY be worth holding onto that information and sending the
 			# updated cert/key when it becomes available. The client will react accordingly and can
 			# reconnect to whatever's needed.
+		elif cmd == "ping":
+			writer.write(b"pong\n")
+			await writer.drain()
 
 async def main():
 	with open("2fa.key") as f: # FileNotFoundError? Store the secret so the TOTPs work
