@@ -15,8 +15,12 @@ async def client(reader, writer):
 	while line := await reader.readline():
 		[cmd, *args] = line.decode().strip().split()
 		if cmd == "auth":
-			# Needs one argument: 2FA code.
-			if totp.verify(args[0] if args else ""):
+			# Needs two argument: user, 2FA code.
+			# Currently the user is not used and should always be "sugar".
+			# Maybe in the future there'll be different users with different perms.
+			if len(args) != 2: continue
+			if args[0] != "sugar": continue
+			if totp.verify(args[1]):
 				print("Authenticated", pid)
 				writer.write(b"login ok\n")
 				await writer.drain()
