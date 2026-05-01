@@ -5,6 +5,12 @@ import socket
 import asyncio
 import pyotp
 
+AVAILABLE_CERTS = {
+	"db.rosuav.com": ("db.rosuav.com.pem", "db.rosuav.com.key"),
+	"stillebot.com": ("/etc/letsencrypt/live/stillebot.com/fullchain.pem", "/etc/letsencrypt/live/stillebot.com/privkey.pem"),
+	"sikorsky.stillebot.com": ("/etc/letsencrypt/live/sikorsky.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/sikorsky.rosuav.com/privkey.pem"),
+	"gideon.stillebot.com": ("/etc/letsencrypt/live/gideon.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/gideon.rosuav.com/privkey.pem"),
+}
 totp = None
 clients = []
 cert_hash = { } # Map a cert name to its SHA1 to recognize changes
@@ -65,17 +71,16 @@ async def client(reader, writer):
 					await writer.drain()
 					continue
 				fn = args[0]
-				if fn not in ("db.rosuav.com", "stillebot.com", "sikorsky.stillebot.com", "gideon.stillebot.com"):
+				if fn not in AVAILABLE_CERTS:
 					writer.write(b"error Unknown file requested\n")
 					await writer.drain()
 					continue
 				cert = b""
 				try:
-					with open(fn + ".pem", "rb") as p, open(fn + ".key", "rb") as k:
-						cert = p.read()
-						if not cert.endswith(b"\n"): cert += b"\n" # It should normally end with a newline, but make absolutely sure.
-						cert += k.read()
-						if not cert.endswith(b"\n"): cert += b"\n"
+					for f in AVAILABLE_CERTS[fn]:
+						print(f)
+						with open(f, "rb") as f:
+							cert += f.read()
 				except FileNotFoundError:
 					writer.write(b"error File not found\n") # Valid name but not on this system
 					await writer.drain()
