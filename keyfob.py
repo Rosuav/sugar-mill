@@ -1,11 +1,13 @@
 # Run this as root to make certificates and their private keys available
 import os
+import hashlib
 import socket
 import asyncio
 import pyotp
 
 totp = None
 clients = []
+cert_hash = { } # Map a cert name to its SHA1 to recognize changes
 
 async def poker():
 	with open("fullchain44.pem", "rb") as p, open("privkey44.pem", "rb") as k:
@@ -87,10 +89,14 @@ async def client(reader, writer):
 					cert = b"INVALID CONTENT\n"
 				writer.write(b"certificate %s\n%s.\n" % (fn.encode(), cert))
 				# At this point, we've sent the file requested, but we also know that this client finds
-				# this file to be useful. It MAY be worth holding onto that information and sending the
-				# updated cert/key when it becomes available. The client will react accordingly and can
-				# reconnect to whatever's needed.
+				# this file to be useful. Track that this client wants this cert; and also quickly hash
+				# the cert so we can see when it changes.
 				cli[1].append(fn)
+				hash = hashlib.sha1(cert).hexdigest()
+				if fn in cert_hash:
+					if cert_hash[fn] != hash: rescan_certs() # TODO: Simplify this (just send out the one cert)
+				else:
+					cert_hash[fn] = hash
 			elif cmd == "ping":
 				writer.write(b"pong\n")
 				await writer.drain()
