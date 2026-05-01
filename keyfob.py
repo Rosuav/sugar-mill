@@ -18,6 +18,9 @@ async def poker():
 				print("Sending hack")
 				cli[0].write(b"certificate %s\n%s.\n" % ("stillebot.com".encode(), cert))
 
+def rescan_certs():
+	print("Rescan certs")
+
 async def client(reader, writer):
 	cli = (writer, [])
 	try:
@@ -29,6 +32,16 @@ async def client(reader, writer):
 		logged_in = False
 		while line := await reader.readline():
 			[cmd, *args] = line.decode().strip().split()
+			if cmd == "reload":
+				# Magic reload signal, does not require login as long as the other end
+				# is a root-owned process.
+				# NOTE: I could probably do better by reading /proc/{pid}/status and
+				# parsing it out, but os.stat on the proc-pid directory itself gives
+				# the same information more conveniently.
+				if os.stat("/proc/%d" % pid).st_uid == 0:
+					rescan_certs()
+					break # Message received, goodbye
+				# Otherwise fall through, pretending that this command doesn't exist
 			if cmd == "auth":
 				# Needs two argument: user, 2FA code.
 				# Currently the user is not used and should always be "sugar".
@@ -100,7 +113,7 @@ async def main():
 		import grp
 		os.chown(sockpath, 0, grp.getgrnam("adm").gr_gid)
 		os.chmod(sockpath, 0o660)
-	_ = asyncio.create_task(poker())
+	# _ = asyncio.create_task(poker()) # Hack: Push out "fresh" certs periodically
 	try:
 		await asyncio.Future()
 	except asyncio.CancelledError:
