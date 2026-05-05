@@ -2,6 +2,7 @@
 import os
 import hashlib
 import socket
+import sys
 import asyncio
 import pyotp
 
@@ -28,6 +29,8 @@ async def poker():
 
 def rescan_certs():
 	print("Rescan certs")
+	for cert, hash in cert_hash.items():
+		print(cert, hash)
 
 async def client(reader, writer):
 	cli = (writer, [])
@@ -109,14 +112,25 @@ async def client(reader, writer):
 		try: clients.remove(cli)
 		except ValueError: pass # In the unlikely case that we crash before appending self, don't replace the exception
 
+# The live key fob has its socket in /var/run, which only root can bind to.
+# For testing purposes, toss a socket into /tmp instead.
+sockpath = "/tmp/certmgr" if os.getuid() else "/var/run/certmgr"
+
+if "reload" in sys.argv:
+	# Rather than starting the server (asynchronously), connect to the server and tell it
+	# to reload its certs.
+	sock = socket.socket(socket.AF_UNIX)
+	sock.connect(sockpath)
+	sock.recv(1024) # Wait for the hello message
+	sock.send(b"reload\n")
+	sock.shutdown(socket.SHUT_RDWR)
+	sys.exit()
+
 async def main():
 	with open("2fa.key") as f: # FileNotFoundError? Store the secret so the TOTPs work
 		secret = f.read().strip()
 		global totp
 		totp = pyotp.TOTP(secret, 8)
-	# The live key fob has its socket in /var/run, which only root can bind to.
-	# For testing purposes, toss a socket into /tmp instead.
-	sockpath = "/tmp/certmgr" if os.getuid() else "/var/run/certmgr"
 	srv = await asyncio.start_unix_server(client, sockpath)
 	if os.getuid() == 0:
 		# Grant group permission on the socket so that non-root users can connect
