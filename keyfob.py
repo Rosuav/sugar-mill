@@ -27,10 +27,24 @@ async def poker():
 				print("Sending hack")
 				cli[0].write(b"certificate %s\n%s.\n" % ("stillebot.com".encode(), cert))
 
-def rescan_certs():
+def fetch_cert(fn):
+	cert = b""
+	for f in AVAILABLE_CERTS[fn]:
+		with open(f, "rb") as f:
+			cert += f.read()
+	return cert
+
+def rescan_certs(fns):
 	print("Rescan certs")
-	for cert, hash in cert_hash.items():
-		print(cert, hash)
+	for fn in fns or cert_hash: # If none passed, check all certs
+		cert = fetch_cert(fn) # Shouldn't get any errors here; if it succeeded once, it should succeed again.
+		hash = hashlib.sha1(cert).hexdigest()
+		if hash == cert_hash[fn]: continue # Hasn't changed.
+		print("CERT CHANGED:", fn)
+		for cli in clients:
+			if fn in cli[1]:
+				print("Sending to client")
+				cli[0].write(b"certificate %s\n%s.\n" % (fn.encode(), cert))
 
 async def client(reader, writer):
 	cli = (writer, [])
@@ -54,7 +68,7 @@ async def client(reader, writer):
 					break # Message received, goodbye
 				# Otherwise fall through, pretending that this command doesn't exist
 			if cmd == "auth":
-				# Needs two argument: user, 2FA code.
+				# Needs two arguments: user, 2FA code.
 				# Currently the user is not used and should always be "sugar".
 				# Maybe in the future there'll be different users with different perms.
 				if len(args) != 2: continue
@@ -78,12 +92,8 @@ async def client(reader, writer):
 					writer.write(b"error Unknown file requested\n")
 					await writer.drain()
 					continue
-				cert = b""
 				try:
-					for f in AVAILABLE_CERTS[fn]:
-						print(f)
-						with open(f, "rb") as f:
-							cert += f.read()
+					cert = fetch_cert(fn)
 				except FileNotFoundError:
 					writer.write(b"error File not found\n") # Valid name but not on this system
 					await writer.drain()
@@ -102,7 +112,7 @@ async def client(reader, writer):
 				cli[1].append(fn)
 				hash = hashlib.sha1(cert).hexdigest()
 				if fn in cert_hash:
-					if cert_hash[fn] != hash: rescan_certs() # TODO: Simplify this (just send out the one cert)
+					if cert_hash[fn] != hash: rescan_certs([fn])
 				else:
 					cert_hash[fn] = hash
 			elif cmd == "ping":
