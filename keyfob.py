@@ -41,6 +41,7 @@ def rescan_certs(fns=()):
 		hash = hashlib.sha1(cert).hexdigest()
 		if hash == cert_hash[fn]: continue # Hasn't changed.
 		print("CERT CHANGED:", fn)
+		cert_hash[fn] = hash
 		for cli in clients:
 			if fn in cli[1]:
 				print("Sending to client")
