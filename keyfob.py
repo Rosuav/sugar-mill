@@ -34,7 +34,7 @@ def fetch_cert(fn):
 			cert += f.read()
 	return cert
 
-def rescan_certs(fns):
+def rescan_certs(fns=()):
 	print("Rescan certs")
 	for fn in fns or cert_hash: # If none passed, check all certs
 		cert = fetch_cert(fn) # Shouldn't get any errors here; if it succeeded once, it should succeed again.
