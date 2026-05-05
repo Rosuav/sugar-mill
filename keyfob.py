@@ -45,11 +45,11 @@ async def client(reader, writer):
 			[cmd, *args] = line.decode().strip().split()
 			if cmd == "reload":
 				# Magic reload signal, does not require login as long as the other end
-				# is a root-owned process.
+				# is a root-owned process. (Or technically, same user as us, for testing.)
 				# NOTE: I could probably do better by reading /proc/{pid}/status and
 				# parsing it out, but os.stat on the proc-pid directory itself gives
 				# the same information more conveniently.
-				if os.stat("/proc/%d" % pid).st_uid == 0:
+				if os.stat("/proc/%d" % pid).st_uid == os.getuid():
 					rescan_certs()
 					break # Message received, goodbye
 				# Otherwise fall through, pretending that this command doesn't exist
