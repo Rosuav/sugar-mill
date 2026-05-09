@@ -119,6 +119,7 @@ async def client(reader, writer):
 			elif cmd == "ping":
 				writer.write(b"pong\n")
 				await writer.drain()
+	except ConnectionResetError: pass
 	finally:
 		try: clients.remove(cli)
 		except ValueError: pass # In the unlikely case that we crash before appending self, don't replace the exception
