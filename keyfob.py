@@ -9,8 +9,8 @@ import pyotp
 AVAILABLE_CERTS = {
 	"db.rosuav.com": ("db.rosuav.com.pem", "db.rosuav.com.key"),
 	"stillebot.com": ("/etc/letsencrypt/live/stillebot.com/fullchain.pem", "/etc/letsencrypt/live/stillebot.com/privkey.pem"),
-	"sikorsky.stillebot.com": ("/etc/letsencrypt/live/sikorsky.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/sikorsky.rosuav.com/privkey.pem"),
-	"gideon.stillebot.com": ("/etc/letsencrypt/live/gideon.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/gideon.rosuav.com/privkey.pem"),
+	"sikorsky.mustardmine.com": ("/etc/letsencrypt/live/sikorsky.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/sikorsky.rosuav.com/privkey.pem"),
+	"gideon.mustardmine.com": ("/etc/letsencrypt/live/gideon.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/gideon.rosuav.com/privkey.pem"),
 }
 totp = None
 clients = []
