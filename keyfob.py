@@ -16,17 +16,6 @@ totp = None
 clients = []
 cert_hash = { } # Map a cert name to its SHA1 to recognize changes
 
-async def poker():
-	with open("fullchain44.pem", "rb") as p, open("privkey44.pem", "rb") as k:
-		cert = p.read() + k.read()
-	while True:
-		await asyncio.sleep(0.5)
-		for cli in clients:
-			if "stillebot.com" in cli[1] and "hack_done" not in cli[1]:
-				cli[1].append("hack_done")
-				print("Sending hack")
-				cli[0].write(b"certificate %s\n%s.\n" % ("stillebot.com".encode(), cert))
-
 def fetch_cert(fn):
 	cert = b""
 	for f in AVAILABLE_CERTS[fn]:
@@ -150,7 +139,6 @@ async def main():
 		import grp
 		os.chown(sockpath, 0, grp.getgrnam("adm").gr_gid)
 		os.chmod(sockpath, 0o660)
-	# _ = asyncio.create_task(poker()) # Hack: Push out "fresh" certs periodically
 	try:
 		await asyncio.Future()
 	except asyncio.CancelledError:
