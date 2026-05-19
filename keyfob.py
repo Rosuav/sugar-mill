@@ -10,11 +10,9 @@ AVAILABLE_CERTS = {
 	"db.rosuav.com": ("db.rosuav.com.pem", "db.rosuav.com.key"),
 	"stillebot.com": ("/etc/letsencrypt/live/stillebot.com/fullchain.pem", "/etc/letsencrypt/live/stillebot.com/privkey.pem"),
 	"sikorsky.mustardmine.com": ("/etc/letsencrypt/live/sikorsky.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/sikorsky.rosuav.com/privkey.pem"),
-	"gideon.mustardmine.com": ("/etc/letsencrypt/live/gideon.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/gideon.rosuav.com/privkey.pem"),
+	# Won't ever be relevant; on Gideon, HTTPS encryption is done by Apache, not Stillebot
+	# "gideon.mustardmine.com": ("/etc/letsencrypt/live/gideon.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/gideon.rosuav.com/privkey.pem"),
 }
-if os.path.exists(AVAILABLE_CERTS["gideon.mustardmine.com"][0]):
-	# We're on Gideon; the shared key is found in a different place.
-	AVAILABLE_CERTS["stillebot.com"] = ("/root/certkey.pem",)
 totp = None
 clients = []
 cert_hash = { } # Map a cert name to its SHA1 to recognize changes
