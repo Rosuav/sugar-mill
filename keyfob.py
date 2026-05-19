@@ -12,6 +12,9 @@ AVAILABLE_CERTS = {
 	"sikorsky.mustardmine.com": ("/etc/letsencrypt/live/sikorsky.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/sikorsky.rosuav.com/privkey.pem"),
 	"gideon.mustardmine.com": ("/etc/letsencrypt/live/gideon.rosuav.com/fullchain.pem", "/etc/letsencrypt/live/gideon.rosuav.com/privkey.pem"),
 }
+if os.path.exists(AVAILABLE_CERTS["gideon.mustardmine.com"][0]):
+	# We're on Gideon; the shared key is found in a different place.
+	AVAILABLE_CERTS["stillebot.com"] = ("/root/certkey.pem",)
 totp = None
 clients = []
 cert_hash = { } # Map a cert name to its SHA1 to recognize changes
