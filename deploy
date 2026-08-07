@@ -1,5 +1,3 @@
-cp db.rosuav.com.* /home/rosuav/stillebot/
-chown rosuav: /home/rosuav/stillebot/db.rosuav.com.*
 cp db.rosuav.com.* /etc/postgresql/16/main/
 chown postgres: /etc/postgresql/16/main/db.rosuav.com.*
 systemctl reload postgresql
