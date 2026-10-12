@@ -100,7 +100,8 @@ async def client(reader, writer):
 				# At this point, we've sent the file requested, but we also know that this client finds
 				# this file to be useful. Track that this client wants this cert; and also quickly hash
 				# the cert so we can see when it changes.
-				cli[1].append(fn)
+				if fn not in cli[1]: cli[1].append(fn)
+				else: print("Client requesting duplicate certificate, resending") # Not sure if this is why I've been getting spam of repeated updates to the same certs?
 				hash = hashlib.sha1(cert).hexdigest()
 				if fn in cert_hash:
 					if cert_hash[fn] != hash: rescan_certs([fn])
