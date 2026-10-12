@@ -6,6 +6,11 @@ import sys
 import asyncio
 import pyotp
 
+_print = print
+def print(*a, **kw):
+	if "file" not in kw: kw["file"] = sys.stderr
+	_print(*a, **kw)
+
 AVAILABLE_CERTS = {
 	"db.rosuav.com": ("db.rosuav.com.pem", "db.rosuav.com.key"),
 	"stillebot.com": ("/etc/letsencrypt/live/stillebot.com/fullchain.pem", "/etc/letsencrypt/live/stillebot.com/privkey.pem"),
